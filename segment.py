@@ -38,7 +38,6 @@ swath_def = geometry.SwathDefinition(lons=lons, lats=lats)
 val_map = kd_tree.resample_nearest(swath_def, vals,area_def, radius_of_influence=100)
 
 #plotting
-#time
 fig    = plt.figure(figsize=(10,10))
 cx      = fig.add_subplot(111)
 
@@ -53,6 +52,6 @@ bmap.readshapefile(polyfile,'poly', drawbounds=True)
 
 fig.savefig(path_out+fname, bbox_inches='tight')
 
-##save TIF 
-#geotiff_file = path_out+fname+'.tif'
-#save_geotiff(val_map, area_def, geotiff_file)
+#save TIF 
+geotiff_file = path_out+fname+'.tif'
+save_geotiff(val_map, area_def, geotiff_file)

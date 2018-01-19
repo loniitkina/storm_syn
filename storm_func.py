@@ -44,3 +44,9 @@ def save_geotiff(raster_array, area_def, export_path):
 	gtiff_band.WriteArray(raster_array)
 
 	gtiff_dataset = None
+
+import csv
+def getColumn(filename, column, delimiter=','):
+    results = csv.reader(open(filename),delimiter=delimiter)
+    next(results, None)
+    return [result[column] for result in results]
