@@ -56,6 +56,12 @@ ic1 = 1.33 * fdd1 ** 0.58
 ic2 = 1.33 * fdd2 ** 0.58
 ic3 = 1.33 * fdd3 ** 0.58
 
+#FDD Anderson
+ic4=(-5.1+np.sqrt((26.01-(26.8*fdd1)*-1)))/2
+print ic4
+
+#make your own FDD model based on measurements from IMB
+
 #Stefan's law
 h0=0        #initial thickness [cm]
 S=5;T=-15
@@ -85,6 +91,7 @@ ax      = fig1.add_subplot(111)
 ax.plot(ic1,c='b', label='FDD with met data')
 ax.plot(ic2,c='r', label='FDD at const Tmean')
 ax.plot(ic3,c='g', label='FDD at const -30')
+ax.plot(ic4,c='k', label='FDD Anderson')
 
 ax.plot(h_1,c='purple', label='Stefan Law')
 ax.plot(h_2,c='m', label='SL, bare ice')
@@ -95,3 +102,6 @@ ax.legend()
 ax.set_xlabel('Day after 15th Jan')
 ax.set_ylabel('Ice thickness (cm)')
 fig1.savefig(path_out+'fdd')
+
+#other option:
+
