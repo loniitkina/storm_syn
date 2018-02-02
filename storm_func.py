@@ -48,5 +48,5 @@ def save_geotiff(raster_array, area_def, export_path):
 import csv
 def getColumn(filename, column, delimiter=','):
     results = csv.reader(open(filename),delimiter=delimiter)
-    next(results, None)
+    next(results, None) #skip header
     return [result[column] for result in results]
