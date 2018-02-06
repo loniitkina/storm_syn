@@ -97,8 +97,13 @@ for fn in flist:
     plt.gca().add_patch(poly)
    
     #large box-band
+    #Northern
     lonband = [5, 15,25,35,45,55,60,60,55,45,35,25,14,5]
     latband = [80,80,80,80,80,80,80,85,85,85,85,85,85,85]
+    #Robs
+    lonband = [5, 15,25,35,45,55,70,70,55,45,35,25,14,5]
+    latband = [79,79,79,79,79,79,79,83,83,83,83,83,83,83]
+    
     xband,yband = m(lonband,latband)
     xyband = zip(xband,yband)
     poly_band = Polygon( xyband, edgecolor='red', alpha=1, fill=False, linewidth=3)
@@ -128,8 +133,14 @@ for fn in flist:
     tmp1 = np.ma.array(tmp,mask=tmp<4)
     lead_grids =  np.ma.count(tmp1)
     nolead_grids = np.ma.count_masked(tmp1)
-    print lead_grids, nolead_grids
+    tmp1 = np.ma.array(tmp,mask=tmp<2)
+    ice_grids =  np.ma.count(tmp1)
+    #print lead_grids, nolead_grids
     lead_fraction = float(lead_grids)/float(lead_grids+nolead_grids)
+    if ice_grids>0:
+        lead_fraction = float(lead_grids)/float(ice_grids)                  #take into account only ice aread (land and no data are excluded)
+    else:
+        lead_fraction = 0
     print lead_fraction
     leadfra.append(lead_fraction)
 
@@ -154,8 +165,11 @@ for fn in flist:
     tmp1 = np.ma.array(tmp,mask=tmp<4)
     lead_grids =  np.ma.count(tmp1)
     nolead_grids = np.ma.count_masked(tmp1)
-    print lead_grids, nolead_grids
+    tmp1 = np.ma.array(tmp,mask=tmp<2)
+    ice_grids =  np.ma.count(tmp1)
+    #print lead_grids, nolead_grids
     lead_fraction = float(lead_grids)/float(lead_grids+nolead_grids)
+    lead_fraction = float(lead_grids)/float(ice_grids)                  #take into account only ice aread (land and no data are excluded)
     print lead_fraction
     leadfra_band.append(lead_fraction)
 
@@ -172,7 +186,8 @@ for fn in flist:
 
     plt.close("all")
     del leads, leads_cut, mask
- 
+
+#convert -delay 100 ../plots/leads20150* ../plots/leads_anim.gif 
 
 #save lists 
 np.save(path_in+'leadfra',leadfra)
@@ -190,6 +205,9 @@ qf = np.load(path_in+'qf.npy')
 leadfra_band = np.load(path_in+'leadfra_band.npy')
 qf_band = np.load(path_in+'qf_band.npy')
 
+leadfra_band_north = np.load(path_in+'leadfra_band_north.npy')
+qf_band_north = np.load(path_in+'qf_band_north.npy')
+
 leadfra_qc = np.ma.array(leadfra,mask=qf==0)
 leadfra = leadfra*100
 leadfra_qc = leadfra_qc*100
@@ -197,6 +215,8 @@ leadfra_qc = leadfra_qc*100
 leadfra_band_qc = np.ma.array(leadfra_band,mask=qf_band==0)
 leadfra_band = leadfra_band*100
 leadfra_band_qc = leadfra_band_qc*100
+
+leadfra_band_north = leadfra_band_north*100
 
 #TIME SERIES PLOT
 fig2 = plt.figure(figsize=(8,8))
@@ -215,8 +235,7 @@ ax.plot(leaddates,leadfra_qc, label='quality checked box')
 ax.plot(leaddates,leadfra_band, label='all data band')
 ax.plot(leaddates,leadfra_band_qc, label='quality checked band')
 
-
-
+ax.plot(leaddates,leadfra_band_north, label='all data band north')
 
 from matplotlib.dates import MO
 days = mdates.DayLocator()   			# every day
@@ -248,3 +267,5 @@ fig2.autofmt_xdate()
 ax.legend(loc='upper right',prop={'size':16}, fancybox=True, framealpha=.5, numpoints=1)
 fig2.tight_layout()
 fig2.savefig(path_out+'leads_ts')
+
+
