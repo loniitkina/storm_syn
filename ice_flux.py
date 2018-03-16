@@ -137,6 +137,11 @@ c3lon_a,c3lat_a = transform(osi_proj,lonlat,yms,-xmc2)
 c4lon_a,c4lat_a = transform(osi_proj,lonlat,yms,-xmc1)
 
 
+#print 'lons: ',c1lon,c2lon,c3lon_a,c4lon_a
+#print 'lats: ',c1lat,c2lat,c3lat_a,c4lat_a
+#exit()
+
+
 ##alternaitve conversion, leading to even worse results:
 #c1x,c1y = area_def.get_xy_from_proj_coords(xmc1,ymc1)
 #c1lon,c1lat = area_def.get_lonlat(c1x,c1y)
@@ -157,11 +162,11 @@ m_icecon_a = []
 m_icecon_b = []
 dates = []
 for fn in iclist:
-    break
+    #break
     print fn
     dt = fn.split('_')[-1].split('.')[0]
     date = datetime.strptime(dt, "%Y%m%d%H%M")
-    if date < datetime(2015,01,20):continue
+    if date < datetime(2015,02,05):continue
     if date > datetime(2015,03,21):continue    
     
     #sea sea ice concentration data
@@ -366,16 +371,16 @@ for fn in iclist:
 
     #exit()
   
-##save lists 
-#np.save(inpath+'advection',advection)
-#np.save(inpath+'advection_a',advection_a)
-#np.save(inpath+'advection_b',advection_b)
+#save lists 
+np.save(inpath+'advection',advection)
+np.save(inpath+'advection_a',advection_a)
+np.save(inpath+'advection_b',advection_b)
 
-#np.save(inpath+'m_icecon',m_icecon)
-#np.save(inpath+'m_icecon_a',m_icecon_a)
-#np.save(inpath+'m_icecon_b',m_icecon_b)
+np.save(inpath+'m_icecon',m_icecon)
+np.save(inpath+'m_icecon_a',m_icecon_a)
+np.save(inpath+'m_icecon_b',m_icecon_b)
 
-#np.save(inpath+'date_flux',dates)
+np.save(inpath+'date_flux',dates)
 
 #load lists
 advection = np.load(inpath+'advection.npy')
@@ -390,8 +395,8 @@ dates = np.load(inpath+'date_flux.npy')
 
 #TIME SERIES PLOT
 fig2 = plt.figure(figsize=(8,8))
-ax = fig2.add_subplot(211)
-ax.set_ylabel(r"Area flux $(km^2/s)$",fontsize=18)
+ax = fig2.add_subplot(312)
+ax.set_ylabel(r"Area flux $(1e3km^2/day)$",fontsize=12)
 ##set the limits for the axis
 #ax.set_xlim(start,end)
 #ax.set_ylim(-5,5)
@@ -400,77 +405,127 @@ ax.set_facecolor('.9')
 ax.tick_params(labelsize=18)
 
 #ax.plot(dates,advection)
-ax.plot(dates,advection_a, c='orange',label='export')
-ax.plot(dates,advection_b, c='g')
+ax.plot(dates,advection_a*24*60*60/1e3, c='orange')
+#ax.plot(dates,advection_b, c='g')
 
 #volume fluxes (mean thicknes=1.5m)
 aax = ax.twinx()
 aax.spines['top'].set_visible(False)
 aax.spines['bottom'].set_visible(False)
 #aax.set_ylabel(r'Volume flux $(km^3/s)$', fontsize=18)
-aax.set_ylabel(r'Distributed heat flux $(W/m^2)$', fontsize=18)
+aax.set_ylabel(r'Distributed heat flux $(W/m^2)$', fontsize=12)
 #aax.plot(dates,advection*.0015, label='OSI-SAF')
 #latent heat flux ~ as if the ice was melting/growing
 rhoi=900        #kg/m3
 li = 334000     #J/kg    (J=kg*m^2/s^2)
-export = advection_a*.0015 *1000000000              #in m^3/s
+export = advection_a *1e6                    #in m^2/s
 area = (xmc1-xmc2)*(ymc1-yms)                    #in m^2
-fl = rhoi*li*export/area
-aax.plot(dates,fl, c='orange',ls='--',label='heat flux')               #W/m^2 (W=J/s)
-
-export = advection_b*.0015 *1000000000              #in m^3/s
-area = (xmc1-xmc2)*(yms-ymc2)                    #in m^2
-fl = rhoi*li*export/area
-aax.plot(dates,fl, c='g',ls='--')               #W/m^2 (W=J/s)
-
-aax.set_ylim(-380,250)
+fl_max = rhoi*li*export/area*1.5
+fl_min = rhoi*li*export/area*1.
+fl_med = rhoi*li*export/area*1.25
 
 
+aax.plot(dates,fl_max, c='0.5',label='max=1.5m')               #W/m^2 (W=J/s)
+aax.plot(dates,fl_min, c='0.5',label='min=1m')
+aax.plot(dates,fl_med, c='orange',label='mean=1.25m')
 
-bx = fig2.add_subplot(212)
-bx.set_ylabel(r"Sea ice concentration",fontsize=18)
+
+
+#export = advection_b*.0015 *1000000000              #in m^3/s
+#area = (xmc1-xmc2)*(yms-ymc2)                    #in m^2
+#fl = rhoi*li*export/area
+#aax.plot(dates,fl, c='g',ls='--')               #W/m^2 (W=J/s)
+
+#aax.set_ylim(-380,250)
+
+
+
+bx = fig2.add_subplot(311)
+bx.set_ylabel(r"Sea ice concentration",fontsize=12)
 bx.grid('on')
 bx.set_facecolor('.9')
 bx.tick_params(labelsize=18)
 
-bx.plot(dates,m_icecon, c='b', label='whole box')
-bx.plot(dates,m_icecon_a, c='orange', label='Svalbard part')
-bx.plot(dates,m_icecon_b, c='g', label='FJL part')
+#bx.plot(dates,m_icecon, c='b', label='whole box')
+bx.plot(dates,m_icecon_a, c='orange')
+#bx.plot(dates,m_icecon_b, c='g', label='FJL part')
+
+bbx = bx.twinx()
+bbx.spines['top'].set_visible(False)
+bbx.spines['bottom'].set_visible(False)
+bbx.set_ylabel(r'Sea ice area $(1e3km^2)$', fontsize=12)
+ic_area_all = area/1e6*m_icecon_a
+bbx.plot(dates,ic_area_all/1e3, c='orange')
+
+
+cx = fig2.add_subplot(313)
+cx.set_ylabel(r"Area change $(1e3km^2/day)$",fontsize=12)
+cx.grid('on')
+cx.set_facecolor('.9')
+cx.tick_params(labelsize=18)
+
+ic_area_change = np.zeros_like(ic_area_all)
+ic_area_change[1:] = ic_area_all[1:]- ic_area_all[:-1]      #if next time step is greater=positive value=increase=sea ice growth in leads&import
+ic_area_export = advection_a *60*60*24                      #km^2/s to km^2/day
+ic_area_melt = ic_area_change + ic_area_export              #km^2/day               import=increase=positive value
+
+print ic_area_change
+print ic_area_export
+
+cx.plot(dates,ic_area_melt/1e3, c='orange')
+
+
+ccx = cx.twinx()
+ccx.spines['top'].set_visible(False)
+ccx.spines['bottom'].set_visible(False)
+ccx.set_ylabel(r'Heat flux $(W/m^2)$', fontsize=12)
+fl_max = rhoi*li*ic_area_melt*1e6/(60*60*24)*1.5  /area          #flux from km^2/day to m^2/s
+fl_min = rhoi*li*ic_area_melt*1e6/(60*60*24)*1./area
+fl_med = rhoi*li*ic_area_melt*1e6/(60*60*24)*1.25/area
+ccx.plot(dates,fl_max, c='0.5')
+ccx.plot(dates,fl_min, c='0.5')
+ccx.plot(dates,fl_med, c='orange')
+
 
 
 from matplotlib.dates import MO
 days = mdates.DayLocator()   			# every day
 mons = mdates.WeekdayLocator(byweekday=MO) 	#every monday
 
-ax.xaxis.set_major_locator(mons)
-ax.xaxis.set_major_formatter(mdates.DateFormatter('%d-%b'))
+#ax.xaxis.set_major_locator(mons)
+#ax.xaxis.set_major_formatter(mdates.DateFormatter('%d-%b'))
 ax.xaxis.set_minor_locator(days)
 
-bx.xaxis.set_major_locator(mons)
-bx.xaxis.set_major_formatter(mdates.DateFormatter('%d-%b'))
+#bx.xaxis.set_major_locator(mons)
+#bx.xaxis.set_major_formatter(mdates.DateFormatter('%d-%b'))
 bx.xaxis.set_minor_locator(days)
+
+cx.xaxis.set_major_locator(mons)
+cx.xaxis.set_major_formatter(mdates.DateFormatter('%d-%b'))
+cx.xaxis.set_minor_locator(days)
+
 
 fig2.autofmt_xdate()
 
 #highlight storms (all based on Lana's storm table, except the first one which is based on temeprature above -20)
 #MAJOR
-[whole_plot.axvspan(datetime(2015,1,21,15,0), datetime(2015,1,22,15,0), facecolor='#d8bfd8', alpha=0.4, linewidth=0) for whole_plot in [ax,bx]]
-[whole_plot.axvspan(datetime(2015,2,3,11,0), datetime(2015,2,8,21,0), facecolor='#d8bfd8', alpha=0.4, linewidth=0) for whole_plot in [ax,bx]]
-[whole_plot.axvspan(datetime(2015,2,15,12,0), datetime(2015,2,16,17,0), facecolor='#d8bfd8', alpha=0.4, linewidth=0) for whole_plot in [ax,bx]]
-[whole_plot.axvspan(datetime(2015,2,17,16,0), datetime(2015,2,21,4,0), facecolor='#d8bfd8', alpha=0.4, linewidth=0) for whole_plot in [ax,bx]]
+[whole_plot.axvspan(datetime(2015,1,21,15,0), datetime(2015,1,22,15,0), facecolor='#d8bfd8', alpha=0.4, linewidth=0) for whole_plot in [ax,bx,cx]]
+[whole_plot.axvspan(datetime(2015,2,3,11,0), datetime(2015,2,8,21,0), facecolor='#d8bfd8', alpha=0.4, linewidth=0) for whole_plot in [ax,bx,cx]]
+[whole_plot.axvspan(datetime(2015,2,15,12,0), datetime(2015,2,16,17,0), facecolor='#d8bfd8', alpha=0.4, linewidth=0) for whole_plot in [ax,bx,cx]]
+[whole_plot.axvspan(datetime(2015,2,17,16,0), datetime(2015,2,21,4,0), facecolor='#d8bfd8', alpha=0.4, linewidth=0) for whole_plot in [ax,bx,cx]]
 
-[whole_plot.axvspan(datetime(2015,3,2,10,0), datetime(2015,3,4,1,0), facecolor='#d8bfd8', alpha=0.4, linewidth=0) for whole_plot in [ax,bx]]
-[whole_plot.axvspan(datetime(2015,3,7,8,0), datetime(2015,3,8,18,0), facecolor='#d8bfd8', alpha=0.4, linewidth=0) for whole_plot in [ax,bx]]
-[whole_plot.axvspan(datetime(2015,3,14,21,0), datetime(2015,3,16,23,0), facecolor='#d8bfd8', alpha=0.4, linewidth=0) for whole_plot in [ax,bx]]
+[whole_plot.axvspan(datetime(2015,3,2,10,0), datetime(2015,3,4,1,0), facecolor='#d8bfd8', alpha=0.4, linewidth=0) for whole_plot in [ax,bx,cx]]
+[whole_plot.axvspan(datetime(2015,3,7,8,0), datetime(2015,3,8,18,0), facecolor='#d8bfd8', alpha=0.4, linewidth=0) for whole_plot in [ax,bx,cx]]
+[whole_plot.axvspan(datetime(2015,3,14,21,0), datetime(2015,3,16,23,0), facecolor='#d8bfd8', alpha=0.4, linewidth=0) for whole_plot in [ax,bx,cx]]
 
 #minor
-[whole_plot.axvspan(datetime(2015,2,13,4,0), datetime(2015,2,13,9,0), facecolor='cornflowerblue', alpha=0.2, linewidth=0) for whole_plot in [ax,bx]]
-[whole_plot.axvspan(datetime(2015,2,22,8,0), datetime(2015,2,23,1,0), facecolor='cornflowerblue', alpha=0.2, linewidth=0) for whole_plot in [ax,bx]]
-[whole_plot.axvspan(datetime(2015,2,25,6,0), datetime(2015,2,25,20,0), facecolor='cornflowerblue', alpha=0.2, linewidth=0) for whole_plot in [ax,bx]]
+[whole_plot.axvspan(datetime(2015,2,13,4,0), datetime(2015,2,13,9,0), facecolor='cornflowerblue', alpha=0.2, linewidth=0) for whole_plot in [ax,bx,cx]]
+[whole_plot.axvspan(datetime(2015,2,22,8,0), datetime(2015,2,23,1,0), facecolor='cornflowerblue', alpha=0.2, linewidth=0) for whole_plot in [ax,bx,cx]]
+[whole_plot.axvspan(datetime(2015,2,25,6,0), datetime(2015,2,25,20,0), facecolor='cornflowerblue', alpha=0.2, linewidth=0) for whole_plot in [ax,bx,cx]]
 
-bx.legend(loc='lower right',prop={'size':16}, fancybox=True, framealpha=.5, numpoints=1)
-ax.legend(loc='lower right',prop={'size':16}, fancybox=True, framealpha=.5, numpoints=1)
-aax.legend(loc='lower center',prop={'size':16}, fancybox=True, framealpha=.5, numpoints=1)
+#bx.legend(loc='lower right',prop={'size':16}, fancybox=True, framealpha=.5, numpoints=1)
+#ax.legend(loc='lower right',prop={'size':16}, fancybox=True, framealpha=.5, numpoints=1)
+aax.legend(loc='upper right',prop={'size':10}, fancybox=True, framealpha=.5, ncol=3)
 fig2.tight_layout()
 fig2.savefig(outpath+'advection_ts')
 
