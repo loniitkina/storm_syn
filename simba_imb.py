@@ -177,7 +177,7 @@ n = 0
 m = 0
 for i in range(0,len(data)):
   if dates[i]!= dates[-1] and dates[i]==dates[i+1]:
-    print dates[i]
+    #print dates[i]
     fp = data[i][:rec[i]]
     sp = data[i+1][:rec[i+1]]
     #print fp
@@ -229,44 +229,56 @@ hc2 = np.array(hc2,dtype=np.float).reshape(m,240)
 #this only works if the gap is just 1 record wide
 mask = (tc==0)
 tc = np.where(mask,np.nan,tc)
-#tc = np.ma.array(tc,mask=mask)
-tcp = np.zeros_like(tc)
-tca = np.zeros_like(tc)
-tcp[1:,:] = tc[:-1,:]
-tca[:-1,:] = tc[1:,:]
-tc[mask] = (tcp[mask]+tca[mask])/2.
-tc = np.nan_to_num(tc)
 
-#mask out the abrupt jumps in data
-tcp[1:,:] = tc[:-1,:]
-diff = np.zeros_like(tc)
-diff[:,sii+3:] = np.abs(tcp[:,sii+3:]-tc[:,sii+3:])
-diff = np.where(tcp==0,0,diff)
+for i in range(0,tc.shape[1]):
+    tmp = pd.Series(tc[:,i],index=date_tc)
+    tmpi = tmp.interpolate()
+    print tmpi
+    tc[:,i] = tmpi.values
 
-tca[:-1,:] = tc[1:,:]
-diffa = np.zeros_like(tc)
-diffa[:,sii:] = np.abs(tca[:,sii:]-tc[:,sii:])
-diffa = np.where(tca==0,0,diffa)
 
-#difference in vertical
-tcu = np.zeros_like(tc)
-tcu[:,1:] = tc[:,:-1]
-diffv = np.zeros_like(tc)
-diffv[:,sii:] = np.abs(tcu[:,sii:]-tc[:,sii:])
-diffv = np.where(tcu==0,0,diffv)
 
-asi = air_snow_no
-sii = snow_ice_no
-ioi = ice_sea_no 
 
-tc_oc=np.zeros_like(tc)
-tc_oc[:,ioi:] = tc[:,ioi:]
-#ocean cooler than -3
-mask =  (tc==0) | (tc_oc<octmplim) | (diff>3.3) | (diffv>3)
-tc = np.ma.array(tc, mask=mask, fill_value=-999)
 
-#use pandas to interpolate missing values
-ts_tc = pd.Series(tc, index=date_tc)
+
+##tc = np.ma.array(tc,mask=mask)
+#tcp = np.zeros_like(tc)
+#tca = np.zeros_like(tc)
+#tcp[1:,:] = tc[:-1,:]
+#tca[:-1,:] = tc[1:,:]
+#tc[mask] = (tcp[mask]+tca[mask])/2.
+#tc = np.nan_to_num(tc)
+
+##mask out the abrupt jumps in data
+#tcp[1:,:] = tc[:-1,:]
+#diff = np.zeros_like(tc)
+#diff[:,sii+3:] = np.abs(tcp[:,sii+3:]-tc[:,sii+3:])
+#diff = np.where(tcp==0,0,diff)
+
+#tca[:-1,:] = tc[1:,:]
+#diffa = np.zeros_like(tc)
+#diffa[:,sii:] = np.abs(tca[:,sii:]-tc[:,sii:])
+#diffa = np.where(tca==0,0,diffa)
+
+##difference in vertical
+#tcu = np.zeros_like(tc)
+#tcu[:,1:] = tc[:,:-1]
+#diffv = np.zeros_like(tc)
+#diffv[:,sii:] = np.abs(tcu[:,sii:]-tc[:,sii:])
+#diffv = np.where(tcu==0,0,diffv)
+
+#asi = air_snow_no
+#sii = snow_ice_no
+#ioi = ice_sea_no 
+
+#tc_oc=np.zeros_like(tc)
+#tc_oc[:,ioi:] = tc[:,ioi:]
+##ocean cooler than -3
+#mask =  (tc==0) | (tc_oc<octmplim) | (diff>3.3) | (diffv>3)
+#tc = np.ma.array(tc, mask=mask, fill_value=-999)
+
+##use pandas to interpolate missing values
+#ts_tc = pd.Series(tc, index=date_tc)
 
 
 ###interpolate the masked values by averaging over neighbouring pixels
@@ -640,4 +652,4 @@ fig1.tight_layout()
 #plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=7))
 #plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%d-%b'))
 fig1.autofmt_xdate()
-fig1.savefig('../plots/simba'+buoyID, bbox_inches='tight')
+fig1.savefig('../plots/simba_new'+buoyID, bbox_inches='tight')

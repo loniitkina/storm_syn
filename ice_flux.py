@@ -166,7 +166,7 @@ for fn in iclist:
     print fn
     dt = fn.split('_')[-1].split('.')[0]
     date = datetime.strptime(dt, "%Y%m%d%H%M")
-    if date < datetime(2015,02,05):continue
+    if date < datetime(2015,01,20):continue
     if date > datetime(2015,03,21):continue    
     
     #sea sea ice concentration data
@@ -189,9 +189,10 @@ for fn in iclist:
     dy = f.variables['dY'][0,:,:]
     f.close()
     
+    #Dy SIGN REVERSED IN VERSION 1.3!!!!
     #calculate drift from first file
     u_coarse1 = dx*1000/(2*24*60*60) #sea ice velocity in m/s
-    v_coarse1 = dy*1000/(2*24*60*60)
+    v_coarse1 = -dy*1000/(2*24*60*60)
     
     #one file before
     dt2 = datetime.strftime(date-timedelta(days=1),"%Y%m%d%H%M")
@@ -201,13 +202,19 @@ for fn in iclist:
     dy = f.variables['dY'][0,:,:]
     f.close()
     
-    #calculate drift from first file
+    #Dy SIGN REVERSED IN VERSION 1.3!!!!
+    #calculate drift from second file
     u_coarse2 = dx*1000/(2*24*60*60) #sea ice velocity in m/s
-    v_coarse2 = dy*1000/(2*24*60*60)
+    v_coarse2 = -dy*1000/(2*24*60*60)
    
     #make average over the two files
     u_coarse = (u_coarse1+u_coarse2)/2
     v_coarse = (v_coarse1+v_coarse2)/2
+    
+    #take values just form the first file
+    u_coarse = u_coarse2
+    v_coarse = v_coarse2
+    
     
     ##reproject the sea ice drift to the ice concentration grid (62.5 > 10km)
     ##tmp = image.ImageContainerNearest(u_coarse, area_def_coarse, radius_of_influence=70000)
@@ -361,7 +368,8 @@ for fn in iclist:
 
     #plot velocities
     x, y = m(coarse_lons, coarse_lats)
-    Q = plt.quiver(x, y, u_coarse, v_coarse, units='width', scale=8, width=.002)
+    ur,vr = Basemap.rotate_vector(m,u_coarse,v_coarse,coarse_lons, coarse_lats)
+    Q = plt.quiver(x, y, ur, vr, units='width', scale=6, width=.002)
     qk = plt.quiverkey(Q, 0.9, 0.1, .1, r'$10 \frac{cm}{s}$', labelpos='E',
                    coordinates='axes',fontproperties={'size': 16},labelcolor='w',color='w')
 
