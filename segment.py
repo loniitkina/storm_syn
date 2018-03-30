@@ -16,15 +16,15 @@ fname = 'tsx20150128'
 leadval = [9,9,9,9,12]
 polyid = 1
 
-#matfile = 'Segmented_image_20150207.mat'
-#fname = 'tsx20150207'
-#leadval = [6,6,7,8,15]
-#polyid = 0
+matfile = 'Segmented_image_20150207.mat'
+fname = 'tsx20150207'
+leadval = [6,6,7,8,15]
+polyid = 2
 
 #matfile = 'Segmented_image_20150212.mat'
 #fname = 'tsx20150212'
 #leadval = [5,8,12,13,14]
-#polyid = 1
+#polyid = 0
 
 
 path = '../data/'
@@ -71,7 +71,8 @@ fig.savefig(path_out+fname, bbox_inches='tight')
 
 
 #extract a mask
-path = Path(bmap.poly[1])
+path = Path(bmap.poly[polyid])
+print path
 xall, yall = x.flatten(), y.flatten()
 xyall = np.vstack((xall,yall)).T
 
@@ -100,7 +101,7 @@ print 'lead fraction: ',lead_fraction
 def PolyArea(x,y):
     return 0.5*np.abs(np.dot(x,np.roll(y,1))-np.dot(y,np.roll(x,1)))
 
-poly = shpol(bmap.poly[1])
+poly = shpol(bmap.poly[polyid])
 px,py = poly.exterior.coords.xy
 area = PolyArea(px,py)
 
@@ -111,6 +112,7 @@ new_ice_vol = area*lead_fraction*.22
 new_ice_fraction_max = new_ice_vol/(old_ice_vol_max+new_ice_vol)
 new_ice_fraction_min = new_ice_vol/(old_ice_vol_min+new_ice_vol)
 
+print 'total polygon area', area
 print 'new ice volume at 1.5m old ice', new_ice_fraction_max
 print 'new ice volume at 1m old ice', new_ice_fraction_min
 
