@@ -14,7 +14,7 @@ from storm_func import *
 ##get all the files
 path = '../data/SIMBA/'
 
-#some default values
+#some default values######################################################################################3
 octmplim = -3
 cr1 = -1.9375  	#value of the reference isotherm (freezing conditions) - formation stage
 cr2 = -1.8750	#melting stage (both are empirical values, only 1 step appart in the sensor resolution)
@@ -32,16 +32,7 @@ swin=6
 melt = datetime(2015,5,26,0,0,0)
 
 skip=0      #how many thermisters to skip in the start (permanent failure)
-################################################PICK A BUOY
-##FMI14
-#start = datetime(2015,1,25,18,0,0)
-#end = datetime(2015,2,26,12,0,0)
-#melt = datetime(2015,2,20,0,0,0)
-#simbaID=300234060695050;cruiseID='N-ICE'; IMBunit='FMI_14';buoyID='SIMBA_2015e';
-#iair = 1; air_snow_no = 45; snow_ice_no = 45; ice_sea_no = 107; franc_bord=46 # normal chain (2cm apart)
-#cr4 = 1.6
-#octmplim = -10
-
+#pick a buoy###############################################################################################3
 #FMI19
 start = datetime(2015,1,28,0,0,0)
 end = datetime(2015,2,19,17,0,0)
@@ -54,13 +45,6 @@ jump = 20
 mv=-0.1875
 skip=2
 
-##FMI20
-#start = datetime(2015,1,29,17,0,0)
-#end = datetime(2015,3,4,0,0,0)
-#simbaID=300234060666760;cruiseID='N-ICE'; IMBunit='FMI_20';buoyID='SIMBA_2015g';
-#iair = 1; air_snow_no = 33; snow_ice_no = 44; ice_sea_no = 109; franc_bord=56#% epaisseur glace130; neige 22; franc-bord 24 a confirmer (2cm apart) 5m chain
-#cr4 = 1.7
-
 ##NPOL01
 #start = datetime(2015,1,20,6,0,0)
 #end = datetime(2015,3,16,9,59,0)
@@ -69,69 +53,7 @@ skip=2
 #cr4 = 1.6
 #mv=-2.2
 
-##NPOL03
-#start = datetime(2015,1,15,23,0,0)
-#end = datetime(2015,2,16,8,59,0)
-#simbaID=300234060000002;cruiseID='2015N-ICE'; IMBunit='NPOL_03';buoyID='SIMBA_2015b';
-#iair = 1; air_snow_no = 37; snow_ice_no = 52; ice_sea_no = 119; franc_bord=54#% epaisseur glacexx; neige xx; franc-bord xx a confirmer (2cm apart)
-#cr4 = 1.9
-
-##NPOL05
-#start = datetime(2015,3,7,16,0,0)
-#end = datetime(2015,4,25,23,59,0)
-#simbaID=300234061762880;cruiseID='2015N-ICE'; IMBunit='NPOL_05';buoyID='SIMBA_2015d';
-#iair = 1; air_snow_no = 52; snow_ice_no = 64; ice_sea_no = 129; franc_bord=68#% epaisseur glacexx; neige xx; franc-bord xx a confirmer (2cm apart)
-##it seems like all the initial interfaces have an offset of at least 4 thermistors (bad readings or bad conversion???)
-#iair = 1; air_snow_no = 40; snow_ice_no = 58; ice_sea_no = 119; franc_bord=68
-#cr4 = 1.5
-
-##NPOL04
-#start = datetime(2015,4,23,13,0,0)
-#end = datetime(2015,6,9,10,0,0)
-#melt = datetime(2015,5,26,0,0,0)
-##NPOL04:
-#start = datetime(2015,4,24,0,0,0)
-#end = datetime(2015,6,8,0,0,0)
-#simbaID=300234061762880;cruiseID='2015N-ICE'; IMBunit='NPOL_04';buoyID='SIMBA_2015c';
-#iair = 1; air_snow_no = 16; snow_ice_no = 47; ice_sea_no = 138; franc_bord=48#% epaisseur glacexx; neige xx; franc-bord xx a confirmer (2cm apart)
-#ssfn = path+'hot_wires/'+'snowstake_floe3_1.txt'
-#hwfn = path+'hot_wires/'+'hw_floe3_1.txt'
-#cr4 = 1.9
-#nta=1
-#swin=6
-#cr1 = -1.8750
-#jump_air = 5
-
-##IAOOS4
-#start = datetime(2015,1,23,14,45,0)
-#end = datetime(2015,3,16,23,50,0)
-#simbaID=300234061260820;cruiseID='2015N-ICE'; IMBunit='Locean_09';buoyID='SIMBA_2015h';
-#iair = 1; air_snow_no = 26; snow_ice_no = 53; ice_sea_no = 130; franc_bord=54#% epaisseur glace 155; neige 55; franc-bord 2
-#ssfn = path+'hot_wires/'+'snowstake_floe1_3.txt'
-#hwfn = path+'hot_wires/'+'hw_floe1_4.txt'
-#cr4 = 1.42
-#nta=7
-
-##IAOOS6
-#start = datetime(2015,2,1,17,0,0)
-#end = datetime(2015,2,21,22,0,0)
-#simbaID=300234061267810;cruiseID='2015N-ICE'; IMBunit='Locean_04';buoyID='SIMBA_2015i';
-#iair = 1; air_snow_no = 9; snow_ice_no = 43; ice_sea_no = 102; franc_bord=41#% pas de mesure car simple echange de valise avec la LOCEAN06!
-#cr4 = 1.45
-#jump = 13
-
-##NPOL041
-#start = datetime(2015,9,15,13,0,0)
-#end = datetime(2015,12,30,0,0,0)
-##melt = datetime(2015,5,26,0,0,0)
-#simbaID=300234061762880;cruiseID='FS-2015'; IMBunit='NPOL_41';buoyID='SIMBA_2015j';
-#iair = 1; air_snow_no = 16; snow_ice_no = 47; ice_sea_no = 138; franc_bord=48#% epaisseur glacexx; neige xx; franc-bord xx a confirmer (2cm apart)
-
-
-#test data Bremerhaven IMB workshop
-
-
-################################################END
+#read the data###############################################################################################3
 
 title = buoyID
 asi = air_snow_no
@@ -219,8 +141,7 @@ tc = np.array(tc,dtype=np.float).reshape(n,150+90)
 hc1 = np.array(hc1,dtype=np.float).reshape(m,240)
 hc2 = np.array(hc2,dtype=np.float).reshape(m,240)
 
-#mask out bad data (chain/thermoster failures)
-
+#clean the data###################################################################################################3
 #whole thermister is usually bad if the first one has some typical missing value
 fail = np.zeros_like(tc)
 for i in range(0,tc.shape[0]):
@@ -276,7 +197,7 @@ hcr = hc2/hc1
 
 
 
-#searching for interfaces
+#searching for interfaces#################################################################################################3
 y = np.arange(0,tc.shape[1])
 #ICE-OCEAN INTERFACE
 tf = -1.8821	#freezing temperature
@@ -406,132 +327,34 @@ ts_sn_6h = ttmp.reindex(ts_oi.index, method='bfill')
 
 h_sn_air_6h = ts_sn_6h.values
 
+##calculating heat fluxes############################################################################3
+
+#conductive heat fluxes
+#vertical temperature gradient
+#k_si = 2.03+0.117*S/T
+k_si = 1.9
+tgrad = tc[:,1:] - tc[:,:-1]
+print tgrad
+fc = -k_si *tgrad
+
+#ocean heat fluxes
+#latent heat flux ~ Fl = rho * Li * growth
+rhoi=900        #kg/m3
+li = 334000     #J/kg    (J=kg*m^2/s^2)
+it = (h_oc_ice - sii) *0.02     #ice thickness in m from initial interface (for detecting bottom growth only)
+print it
+growth = it[1:] - it[:-1]               #ice growth in m/6h
+print growth
+growth = growth /(6*60*60)                #ice growth in m/s
+fl = rhoi*li*growth
+fl = smooth(fl,8,window='flat')           #smoothing with 2-day running window
+print fl
+#exit()
 
 
-##end of interfaces##################################################################################3
-
-##snow depth
-#sd = (h_ice_sn_6h - h_sn_air_6h) *2
-##ice thickness 
-#it = (h_oc_ice - h_ice_sn_6h) *2 #2cm spacing og the thermistor chain
-
-##average temperatures/interface temperatures
-#astemp = []
-#stemp = []
-#stemp_fr = []
-#sitemp = []
-#itemp = []
-#itemp_fr = []
-#iotemp = []
-#otemp = []
-#for i in range(0,tc.shape[0]-9):
-  ###air
-  ##atemp = np.mean(tc[:,:asi],axis=1)
-  ###air-snow
-  #astemp.append(tc[i,h_sn_air_6h[i]])
-  ###snow
-  #ub = int(h_sn_air_6h[i])
-  #lb = int(h_ice_sn_6h[i])
-  #stemp.append(np.mean(tc[i,ub:lb]))
-  #frtmp = tc[i,ub:lb].filled(fill_value=-999)
-  #fr_str = np.array_repr(frtmp).replace('\n', '')
-  #stemp_fr.append(fr_str)
-  ###snow-ice
-  #sitemp.append(tc[i,h_ice_sn_6h[i]])
-  ###ice
-  #ub = int(h_ice_sn_6h[i])
-  #lb = int(h_oc_ice[i])
-  #itemp.append(np.mean(tc[i,ub:lb]))
-  #frtmp = tc[i,ub:lb].filled(fill_value=-999)
-  #fr_str = np.array_repr(frtmp).replace('\n', '')
-  #itemp_fr.append(fr_str)
-  ##ocean
-  #iotemp.append(tc[i,h_oc_ice[i]])
-  #otemp.append(tc[i,h_oc_ice[i]+5])
-
-##write out timeseries
-#tt = [date_tc, it, sd, astemp, stemp, stemp_fr, sitemp, itemp, itemp_fr, iotemp, otemp]
-#table = zip(*tt)
-##print table[0]
-
-#outname = path + 'ice_thickness_'+buoyID+'.out'
-#with open(outname, 'wb') as f:
-  ##header
-  #f.write(b'time, ice thickness, snow depth, air-snow temperature, snow mean temperature, snow temperature - full resolution (every 2cm), snow-ice temperature, ice mean temperature, ice temperature - full resolution (every 2cm), ice-ocean interface temperature, ocean temperature 10cm below ice\n')
-  ##f.write(b'time; ice thickness; snow depth; air-snow temperature; snow mean temperature; snow temperature - full resolution (every 2cm); snow-ice temperature; ice mean temperature; ice temperature - full resolution (every 2cm); ice-ocean interface temperature; ocean temperature 10cm below ice\n')
-  #np.savetxt(f, table, fmt="%s", delimiter=",")
-
-##write out timeseries for simple use
-#tt = [date_tc, it, sd, astemp, stemp, sitemp, itemp, iotemp, otemp]
-#table = zip(*tt)
-##print table[0]
-
-#outname = path + 'ice_thickness_basic'+buoyID+'.out'
-#with open(outname, 'wb') as f:
-  ##header
-  #f.write(b'time, ice thickness, snow depth, air-snow temperature, snow mean temperature, snow-ice temperature, ice mean temperature, ice-ocean interface temperature, ocean temperature 10cm below ice\n')
-  ##f.write(b'time; ice thickness; snow depth; air-snow temperature; snow mean temperature; snow temperature - full resolution (every 2cm); snow-ice temperature; ice mean temperature; ice temperature - full resolution (every 2cm); ice-ocean interface temperature; ocean temperature 10cm below ice\n')
-  #np.savetxt(f, table, fmt="%s", delimiter=",")
-
-
-##quality checked temperature data
-#tmp=np.ma.filled(tc)
-#tt = [date_tc, tmp.tolist()]
-#table = zip(*tt)
-
-##print table
-##exit()
-
-#outname = path + 'temp'+buoyID+'.out'
-#with open(outname, 'wb') as f:
-  ##header
-  #f.write(b'time, temperature - full resolution (every 2cm)\n')
-  ##f.write(b'time; ice thickness; snow depth; air-snow temperature; snow mean temperature; snow temperature - full resolution (every 2cm); snow-ice temperature; ice mean temperature; ice temperature - full resolution (every 2cm); ice-ocean interface temperature; ocean temperature 10cm below ice\n')
-  #np.savetxt(f, table, fmt="%s", delimiter=",")
-
-
-
-##snow stakes and hot wire readings
-#sdsd=[]
-#hwsd=[]
-#sdd=[]
-#hwd=[]
-#sd=[]
-#hw=[]
-
-#if 'ssfn' in locals():
-  ##snow stakes
-  #tmp = np.loadtxt(ssfn, dtype=np.str, skiprows=2)
-  #tmpt = tmp[:,0]
-  #sdd = [ datetime.strptime(tmpt[x], "%d.%m.%Y") for x in range(len(tmpt)) ]
-  #tmps = tmp[:,1]
-  #sd = [ np.float(tmps[x]) for x in range(len(tmps)) ]
-  #sd = np.array(sd)/-2. + snow_ice_no
-  #tmps = tmp[:,2]
-  #sdsd = [ np.float(tmps[x]) for x in range(len(tmps)) ]
-  #sdsd = np.array(sdsd)/-2.
-#if 'hwfn' in locals():
-  ##hot wires
-  #tmp = np.loadtxt(hwfn, dtype=np.str, skiprows=2)
-  #tmpt = tmp[:,0]
-  #hwd = [ datetime.strptime(tmpt[x], "%d.%m.%Y") for x in range(len(tmpt)) ]
-  #tmps = tmp[:,1]
-  #hw = [ np.float(tmps[x]) for x in range(len(tmps)) ]
-  #hw = np.array(hw)/2. + snow_ice_no
-  #tmps = tmp[:,2]
-  #hwsd = [ np.float(tmps[x]) for x in range(len(tmps)) ]
-  #hwsd = np.array(hwsd)/2.
-
-#first preview plots
-#plt.imshow(tc.T)
-#plt.show()
-#plt.imshow(hc.T)
-#plt.show()
-
-
-#fancy plots
+#plotting############################################################################################3
 fig1 = plt.figure(figsize=(15,11))
-ax = fig1.add_subplot(211)
+ax = fig1.add_subplot(311)
 #ax.set_title(title,fontsize=20)
 ax.set_ylabel(r"Distance (m)",size=18)
 #set the limits for the axis
@@ -555,10 +378,10 @@ plt.pcolor(x,y,tc.T, cmap=plt.cm.RdYlBu_r, vmin=a, vmax=b)
 cbar = plt.colorbar()
 cbar.ax.set_ylabel(r'Temperature ($^\circ$C)',size=18)
 
-#add initial interface depths
-ax.axhline(asi,color='.2',linestyle='--',linewidth=3)
-ax.axhline(sii,color='.2',linestyle='--',linewidth=3)
-ax.axhline(ioi,color='.2',linestyle='--',linewidth=3)
+##add initial interface depths
+#ax.axhline(asi,color='.2',linestyle='--',linewidth=3)
+#ax.axhline(sii,color='.2',linestyle='--',linewidth=3)
+#ax.axhline(ioi,color='.2',linestyle='--',linewidth=3)
 
 #plot ice-ocean interface
 ax.plot(date_tc,h_oc_ice,'w',linewidth=3)
@@ -581,13 +404,8 @@ bottom='on',      # ticks along the bottom edge are off
 top='on',         # ticks along the top edge are off
 labelbottom='off')
 
-##plot snow stake and hotwire data
-#if 'ssfn' in locals():
-  #ax.errorbar(sdd, sd, sdsd, linestyle='None', marker='o', color='m',label='snow stakes')
-  #ax.errorbar(hwd, hw, hwsd, linestyle='None', marker='o',label='hot wires')
-  #ax.legend(loc='lower left',prop={'size':15}, fancybox=True, framealpha=0.5)
 
-bx = fig1.add_subplot(212)
+bx = fig1.add_subplot(312)
 bx.set_ylabel(r"Distance (m)",size=18)
 #set the limits for the axis
 bx.set_xlim(start,end)
@@ -626,9 +444,14 @@ else:
 #plot air-snow interface
 bx.plot(date_tc,h_sn_air_6h,'w',linewidth=3)
 
+#ocean heat flux
+cx = fig1.add_subplot(313)
+cx.plot(date_tc[1:],fl)
+cx.plot(date_tc[:],fc[:,sii])
+
 fig1.tight_layout()
 #ax.axes.get_xaxis().set_ticks([])
 #plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=7))
 #plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%d-%b'))
 fig1.autofmt_xdate()
-fig1.savefig('../plots/simba_new'+buoyID, bbox_inches='tight')
+fig1.savefig('../plots/simba_storm'+buoyID, bbox_inches='tight')
