@@ -162,7 +162,7 @@ m_icecon_a = []
 m_icecon_b = []
 dates = []
 for fn in iclist:
-    #break
+    break
     print fn
     dt = fn.split('_')[-1].split('.')[0]
     date = datetime.strptime(dt, "%Y%m%d%H%M")
@@ -379,16 +379,16 @@ for fn in iclist:
 
     #exit()
   
-#save lists 
-np.save(inpath+'advection',advection)
-np.save(inpath+'advection_a',advection_a)
-np.save(inpath+'advection_b',advection_b)
+##save lists 
+#np.save(inpath+'advection',advection)
+#np.save(inpath+'advection_a',advection_a)
+#np.save(inpath+'advection_b',advection_b)
 
-np.save(inpath+'m_icecon',m_icecon)
-np.save(inpath+'m_icecon_a',m_icecon_a)
-np.save(inpath+'m_icecon_b',m_icecon_b)
+#np.save(inpath+'m_icecon',m_icecon)
+#np.save(inpath+'m_icecon_a',m_icecon_a)
+#np.save(inpath+'m_icecon_b',m_icecon_b)
 
-np.save(inpath+'date_flux',dates)
+#np.save(inpath+'date_flux',dates)
 
 #load lists
 advection = np.load(inpath+'advection.npy')
@@ -428,14 +428,14 @@ rhoi=900        #kg/m3
 li = 334000     #J/kg    (J=kg*m^2/s^2)
 export = advection_a *1e6                    #in m^2/s
 area = (xmc1-xmc2)*(ymc1-yms)                    #in m^2
-fl_max = rhoi*li*export/area*1.5
-fl_min = rhoi*li*export/area*1.
-fl_med = rhoi*li*export/area*1.25
+a_fl_max = rhoi*li*export/area*1.5
+a_fl_min = rhoi*li*export/area*1.
+a_fl_med = rhoi*li*export/area*1.25
 
 
-aax.plot(dates,fl_max, c='0.5',label='max=1.5m')               #W/m^2 (W=J/s)
-aax.plot(dates,fl_min, c='0.5',label='min=1m')
-aax.plot(dates,fl_med, c='orange',label='mean=1.25m')
+aax.plot(dates,a_fl_max, c='0.5',label='max=1.5m')               #W/m^2 (W=J/s)
+aax.plot(dates,a_fl_min, c='0.5',label='min=1m')
+aax.plot(dates,a_fl_med, c='orange',label='mean=1.25m')
 
 
 
@@ -537,10 +537,21 @@ aax.legend(loc='upper right',prop={'size':10}, fancybox=True, framealpha=.5, nco
 fig2.tight_layout()
 fig2.savefig(outpath+'advection_ts')
 
+#write out this time series into csv file
+tt = [dates, m_icecon_a, ic_area_all/1e3, advection_a*24*60*60/1e3, a_fl_min, a_fl_med, a_fl_max, ic_area_melt/1e3, fl_min, fl_med, fl_max]
+table = zip(*tt)
+#print table[0]
+
+outname = inpath + 'ice_flux.out'
+with open(outname, 'wb') as f:
+  #header
+  f.write(b'date, ice concentration, ice_area [1e3km^2], advection [1e3km^2/day], adv. f_latent_min [W/m2], adv. f_latent_med [W/m2], adv. f_latent_max [W/m2], Area change melt [1e3km^2/day], adv. f_latent_min [W/m2], adv. f_latent_med [W/m2], adv. f_latent_max [W/m2]\n')
+  np.savetxt(f, table, fmt="%s", delimiter=",")
+
+
 #convert -delay 100 ../plots/icecon20150* ../plots/icecon_anim.gif
 
 #scatter plots for A and B
-#TIME SERIES PLOT
 fig3 = plt.figure(figsize=(12,6))
 ax = fig3.add_subplot(121)
 ax.set_title('Svalbard part')

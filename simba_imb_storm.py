@@ -32,6 +32,8 @@ swin=6
 melt = datetime(2015,5,26,0,0,0)
 
 skip=0      #how many thermisters to skip in the start (permanent failure)
+
+cuty=100    #how many termisters in the ocean can be cut off the plot
 #pick a buoy###############################################################################################3
 #FMI19
 start = datetime(2015,1,28,0,0,0)
@@ -363,10 +365,10 @@ ax.grid('on')
 ax.set_axis_bgcolor('.9')
 y = np.arange(0,tc.shape[1])
 #turn around the y axis
-ax.set_ylim(y[-1],y[0])
+ax.set_ylim(y[-cuty],y[0])
 #convert thermister number to distance in m
-yt = np.arange(0,tc.shape[1]*0.02,.5)
-plt.yticks(y[::25], yt)
+yt = np.arange(0,(tc.shape[1]-cuty)*0.02,.5)
+plt.yticks(y[0:-cuty][::25], yt)
 x = mdates.date2num(date_tc)
 #define winter and summer color scale
 if start > datetime(2015,4,1,0,0,0):
@@ -412,9 +414,9 @@ bx.set_xlim(start,end)
 bx.grid('on')
 bx.set_axis_bgcolor('.9')
 #turn around the y axis
-bx.set_ylim(y[-1],y[0])
+bx.set_ylim(y[-cuty],y[0])
 #convert thermister number to distance in m
-plt.yticks(y[::25], yt)
+plt.yticks(y[0:-cuty][::25], yt)
 x = mdates.date2num(date_hc)
 if IMBunit=='NPOL_04':
   idx = np.array([2,8,10,30,31,32,33,34,35])
