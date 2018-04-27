@@ -285,7 +285,10 @@ ts_is = pd.Series(h_ice_sn, index=date_hc)
 ttmp = ts_is.resample(rule='6H',fill_method='bfill')
 ts_oi = pd.Series(h_oc_ice, index=date_tc)
 ts_is_6h = ttmp.reindex(ts_oi.index, method='bfill')
-h_ice_sn_6h = ts_is_6h.values
+ttmp = ts_is_6h.interpolate()   #get rid of nans
+h_ice_sn_6h = ttmp.values
+h_ice_sn_6h = np.where(h_ice_sn_6h==np.nan,0,h_ice_sn_6h)
+
 
 #AIR-SNOW INTERFACE
 #under development: snow has higher thermal resistivity than air, when there is no jump sharp difference between the snow and air, the chain is iced and value should be interpolated
@@ -326,31 +329,50 @@ ts_sn = pd.Series(h_sn_air, index=date_hc)
 #same tricky time step as above!!!
 ttmp = ts_sn.resample(rule='6H',fill_method='bfill')
 ts_sn_6h = ttmp.reindex(ts_oi.index, method='bfill')
-
-h_sn_air_6h = ts_sn_6h.values
+ttmp = ts_sn_6h.interpolate()   #get rid of nans
+h_sn_air_6h = ttmp.values
+h_sn_air_6h = np.where(h_sn_air_6h==np.nan,0,h_sn_air_6h)
 
 ##calculating heat fluxes############################################################################3
 
 #conductive heat fluxes
 #vertical temperature gradient
+k_sn = .3
+tgrad = tc[:,1:] - tc[:,:-1]
+#print tgrad
+fc = -k_sn *tgrad
+#mask all but snow
+mask = np.ones_like(fc, dtype=bool)
+for i in range(0,fc.shape[0]):
+    mask[:,int(h_sn_air_6h[i]):int(h_ice_sn_6h[i])] = False
+fc_snow = np.ma.array(fc,mask=mask)
+
+#ice
 #k_si = 2.03+0.117*S/T
 k_si = 1.9
-tgrad = tc[:,1:] - tc[:,:-1]
-print tgrad
 fc = -k_si *tgrad
+#smooth
+for i in range(0,fc.shape[0]):
+    fc[i,:] = smooth(fc[i,:],6,window='flat')
+#mask all but ice
+mask = np.ones_like(fc, dtype=bool)
+for i in range(0,fc.shape[0]):
+    mask[:,int(h_ice_sn_6h[i]):int(h_oc_ice[i])] = False
+fc_ice = np.ma.array(fc,mask=mask)
+
 
 #ocean heat fluxes
 #latent heat flux ~ Fl = rho * Li * growth
 rhoi=900        #kg/m3
 li = 334000     #J/kg    (J=kg*m^2/s^2)
 it = (h_oc_ice - sii) *0.02     #ice thickness in m from initial interface (for detecting bottom growth only)
-print it
+#print it
 growth = it[1:] - it[:-1]               #ice growth in m/6h
-print growth
+#print growth
 growth = growth /(6*60*60)                #ice growth in m/s
 fl = rhoi*li*growth
 fl = smooth(fl,8,window='flat')           #smoothing with 2-day running window
-print fl
+#print fl
 #exit()
 
 
@@ -406,7 +428,7 @@ bottom='on',      # ticks along the bottom edge are off
 top='on',         # ticks along the top edge are off
 labelbottom='off')
 
-
+#conductive heat fluxes
 bx = fig1.add_subplot(312)
 bx.set_ylabel(r"Distance (m)",size=18)
 #set the limits for the axis
@@ -417,21 +439,16 @@ bx.set_axis_bgcolor('.9')
 bx.set_ylim(y[-cuty],y[0])
 #convert thermister number to distance in m
 plt.yticks(y[0:-cuty][::25], yt)
-x = mdates.date2num(date_hc)
-if IMBunit=='NPOL_04':
-  idx = np.array([2,8,10,30,31,32,33,34,35])
-  mask = np.zeros_like(hcr)
-  mask[idx,:] = 1
-  hcr = np.ma.array(hcr,mask=mask)
-
-plt.pcolor(x,y,hcr.T, cmap=plt.cm.RdYlBu_r, vmin=.5, vmax=2)
+#plt.pcolor(x,y,fc_snow.T, cmap=plt.cm.RdBu_r, vmin=-2, vmax=2)
+plt.pcolor(x,y,fc_ice.T, cmap=plt.cm.RdBu_r, vmin=-.5, vmax=.5)
+plt.pcolor(x,y,fc_snow.T, cmap=plt.cm.RdBu_r, vmin=-.5, vmax=.5)
 cbar = plt.colorbar()
-cbar.ax.set_ylabel(r'Thermal resistivity proxy',size=18)
+cbar.ax.set_ylabel(r'Conductive heat flux ($W/m^2$)',size=18)
 
-#add initial interface depths
-bx.axhline(asi,color='.2',linestyle='--',linewidth=3)
-bx.axhline(sii,color='.2',linestyle='--',linewidth=3)
-bx.axhline(ioi,color='.2',linestyle='--',linewidth=3)
+##add initial interface depths
+#bx.axhline(asi,color='.2',linestyle='--',linewidth=3)
+#bx.axhline(sii,color='.2',linestyle='--',linewidth=3)
+#bx.axhline(ioi,color='.2',linestyle='--',linewidth=3)
 
 #plot ice-ocean interface
 bx.plot(date_tc,h_oc_ice,'w',linewidth=3)
