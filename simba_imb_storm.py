@@ -29,7 +29,8 @@ jump_air = 8
 #smoothing window
 swin=6
 
-melt = datetime(2015,5,26,0,0,0)
+melt = datetime(2015,2,18,0,0,0)
+snowice=melt
 
 skip=0      #how many thermisters to skip in the start (permanent failure)
 
@@ -46,6 +47,7 @@ cr4= 1.5
 jump = 20
 mv=-0.1875
 skip=2
+snowice = datetime(2015,2,17,23,0,0)
 
 ##NPOL01
 #start = datetime(2015,1,20,6,0,0)
@@ -54,6 +56,8 @@ skip=2
 #iair = 1; air_snow_no = 29; snow_ice_no = 52; ice_sea_no = 118; franc_bord=53#% epaisseur glacexx; neige xx; franc-bord xx a confirmer (2cm apart)
 #cr4 = 1.6
 #mv=-2.2
+#jump_air = 5
+#snowice = datetime(2015,3,9,18,0,0)
 
 #read the data###############################################################################################3
 
@@ -338,13 +342,13 @@ h_sn_air_6h = np.where(h_sn_air_6h==np.nan,0,h_sn_air_6h)
 #conductive heat fluxes
 #vertical temperature gradient
 k_sn = .3
-tgrad = tc[:,1:] - tc[:,:-1]
+tgrad = (tc[:,1:] - tc[:,:-1])*50    #K/2cm >> K/m
 #print tgrad
 fc = -k_sn *tgrad
 #mask all but snow
 mask = np.ones_like(fc, dtype=bool)
 for i in range(0,fc.shape[0]):
-    mask[:,int(h_sn_air_6h[i]):int(h_ice_sn_6h[i])] = False
+    mask[i,int(h_sn_air_6h[i]):int(h_ice_sn_6h[i])] = False
 fc_snow = np.ma.array(fc,mask=mask)
 
 #ice
@@ -353,11 +357,11 @@ k_si = 1.9
 fc = -k_si *tgrad
 #smooth
 for i in range(0,fc.shape[0]):
-    fc[i,:] = smooth(fc[i,:],6,window='flat')
+    fc[i,:] = smooth(fc[i,:],4,window='flat')
 #mask all but ice
 mask = np.ones_like(fc, dtype=bool)
 for i in range(0,fc.shape[0]):
-    mask[:,int(h_ice_sn_6h[i]):int(h_oc_ice[i])] = False
+    mask[i,int(h_ice_sn_6h[i]):int(h_oc_ice[i])] = False
 fc_ice = np.ma.array(fc,mask=mask)
 
 
@@ -367,7 +371,7 @@ rhoi=900        #kg/m3
 li = 334000     #J/kg    (J=kg*m^2/s^2)
 it = (h_oc_ice - sii) *0.02     #ice thickness in m from initial interface (for detecting bottom growth only)
 #print it
-growth = it[1:] - it[:-1]               #ice growth in m/6h
+growth = it[:-1] - it[1:]               #ice growth in m/6h
 #print growth
 growth = growth /(6*60*60)                #ice growth in m/s
 fl = rhoi*li*growth
@@ -398,24 +402,33 @@ if start > datetime(2015,4,1,0,0,0):
   a = -3;b=2
 else:
   a = -30;b=-1
-plt.pcolor(x,y,tc.T, cmap=plt.cm.RdYlBu_r, vmin=a, vmax=b)
-cbar = plt.colorbar()
-cbar.ax.set_ylabel(r'Temperature ($^\circ$C)',size=18)
+im = plt.pcolor(x,y,tc.T, cmap=plt.cm.RdYlBu_r, vmin=a, vmax=b)
+#get colorbar off the figure (or x-axis wont be aligned!)
+cbaxes = fig1.add_axes([1.005, 0.73, 0.01, 0.26]) 
+cb = plt.colorbar(im, cax = cbaxes)  
+cb.ax.set_ylabel(r'Temperature ($^\circ$C)',size=18)
 
-##add initial interface depths
-#ax.axhline(asi,color='.2',linestyle='--',linewidth=3)
-#ax.axhline(sii,color='.2',linestyle='--',linewidth=3)
-#ax.axhline(ioi,color='.2',linestyle='--',linewidth=3)
+#plot contours in the ocean
+#mask all but ocean
+mask = np.ones_like(tc, dtype=bool)
+for i in range(0,tc.shape[0]):
+    mask[i,int(h_oc_ice[i]):] = False
+tc_oc = np.ma.array(tc,mask=mask)
+val = [-1.5]
+plt.contour(x,y,tc_oc.T,val,c='k')
+
+#maxice line
+maxice = np.argmax(h_oc_ice)
+meltline = np.zeros_like(h_oc_ice)
+meltline[maxice:]=h_oc_ice[maxice]
+meltline = np.ma.array(meltline,mask=meltline==0)
+ax.plot(date_tc,meltline,color='w',linestyle='--',linewidth=3)
 
 #plot ice-ocean interface
 ax.plot(date_tc,h_oc_ice,'w',linewidth=3)
 
 #plot snow-ice interface
-if IMBunit=='NPOL_04':
-  ax.plot(date_tc[-20:],h_ice_sn_6h[-20:],'--w',linewidth=3)
-  ax.axhline(sii+2,color='w',linestyle='-',linewidth=3)
-else:
-  ax.plot(date_tc,h_ice_sn_6h,'w',linewidth=3)
+ax.plot(date_tc,h_ice_sn_6h,'w',linewidth=3)
 
 #plot air-snow interface
 ax.plot(date_tc,h_sn_air_6h,'w',linewidth=3)
@@ -429,7 +442,7 @@ top='on',         # ticks along the top edge are off
 labelbottom='off')
 
 #conductive heat fluxes
-bx = fig1.add_subplot(312)
+bx = fig1.add_subplot(312, sharex=ax)
 bx.set_ylabel(r"Distance (m)",size=18)
 #set the limits for the axis
 bx.set_xlim(start,end)
@@ -439,38 +452,48 @@ bx.set_axis_bgcolor('.9')
 bx.set_ylim(y[-cuty],y[0])
 #convert thermister number to distance in m
 plt.yticks(y[0:-cuty][::25], yt)
-#plt.pcolor(x,y,fc_snow.T, cmap=plt.cm.RdBu_r, vmin=-2, vmax=2)
-plt.pcolor(x,y,fc_ice.T, cmap=plt.cm.RdBu_r, vmin=-.5, vmax=.5)
-plt.pcolor(x,y,fc_snow.T, cmap=plt.cm.RdBu_r, vmin=-.5, vmax=.5)
-cbar = plt.colorbar()
-cbar.ax.set_ylabel(r'Conductive heat flux ($W/m^2$)',size=18)
-
-##add initial interface depths
-#bx.axhline(asi,color='.2',linestyle='--',linewidth=3)
-#bx.axhline(sii,color='.2',linestyle='--',linewidth=3)
-#bx.axhline(ioi,color='.2',linestyle='--',linewidth=3)
+plt.pcolor(x,y,fc_snow.T, cmap=plt.cm.RdBu_r, vmin=-30, vmax=30)
+im = plt.pcolor(x,y,fc_ice.T, cmap=plt.cm.RdBu_r, vmin=-30, vmax=30)
+#get colorbar off the figure (or x-axis wont be aligned!)
+cbaxes = fig1.add_axes([1.005, 0.42, 0.01, 0.26]) 
+cb = plt.colorbar(im, cax = cbaxes)  
+cb.ax.set_ylabel(r'Heat flux ($W/m^2$)',size=18)
 
 #plot ice-ocean interface
 bx.plot(date_tc,h_oc_ice,'w',linewidth=3)
 
 #plot snow-ice interface
-if IMBunit=='NPOL_04':
-  bx.plot(date_tc[-20:],h_ice_sn_6h[-20:],'--w',linewidth=3)
-  bx.axhline(sii+1,color='w',linestyle='-',linewidth=3)
-else:
-  bx.plot(date_tc,h_ice_sn_6h,'w',linewidth=3)
+bx.plot(date_tc,h_ice_sn_6h,'w',linewidth=3)
 
 #plot air-snow interface
 bx.plot(date_tc,h_sn_air_6h,'w',linewidth=3)
 
-#ocean heat flux
-cx = fig1.add_subplot(313)
-cx.plot(date_tc[1:],fl)
-cx.plot(date_tc[:],fc[:,sii])
+#snow-ice formation start
+bx.axvline(snowice,color='.4',linestyle='--',linewidth=4)
 
-fig1.tight_layout()
-#ax.axes.get_xaxis().set_ticks([])
-#plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=7))
-#plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%d-%b'))
+#dont plot dates on bx
+bx.tick_params(
+axis='x',          # changes apply to the x-axis
+which='both',      # both major and minor ticks are affected
+bottom='on',      # ticks along the bottom edge are off
+top='on',         # ticks along the top edge are off
+labelbottom='off')
+
+
+#ocean heat flux
+cx = fig1.add_subplot(313,sharex=ax)
+cx.set_xlim(start,end)
+cx.set_ylabel(r'Heat flux ($W/m^2$)',size=18)
+cx.plot(date_tc[1:],fl,c='royalblue',linewidth=3)
+cx.axhline(0,color='.4',linestyle='-',linewidth=1)
+
+ccx = cx.twinx()
+ccx.set_ylabel(r'Heat flux ($W/m^2$)',size=18)
+ccx.plot(date_tc[:],fc[:,100],c='darkred',linewidth=3)
+
+cx.axes.get_xaxis().set_ticks([])
+plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=7))
+plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%d-%b'))
 fig1.autofmt_xdate()
+plt.subplots_adjust(top=0.99, right=0.99)
 fig1.savefig('../plots/simba_storm'+buoyID, bbox_inches='tight')
