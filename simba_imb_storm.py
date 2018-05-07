@@ -39,10 +39,8 @@ cuty=100    #how many termisters in the ocean can be cut off the plot
 #FMI19
 start = datetime(2015,1,28,0,0,0)
 end = datetime(2015,2,19,17,0,0)
-simbaID=300234060669770;cruiseID='N-ICE'; IMBunit='FMI_19';buoyID='SIMBA_2015f';
+simbaID=300234060669770;cruiseID='N-ICE'; IMBunit='FMI_19';buoyID='SIMBA_2015f'; buoyID_replacement='SNOW_2015a'
 iair = 1; air_snow_no = 34; snow_ice_no = 55; ice_sea_no = 100; franc_bord=54# epaisseur glace90; neige 43; franc-bord -1 a confirmer (2cm apart)
-#ssfn = path+'hot_wires/'+'snowstake_floe1_1.txt'
-#hwfn = path+'hot_wires/'+'hw_floe1_1.txt'
 cr4= 1.5
 jump = 20
 mv=-0.1875
@@ -51,8 +49,8 @@ snowice = datetime(2015,2,17,23,0,0)
 
 ##NPOL01
 #start = datetime(2015,1,20,6,0,0)
-#end = datetime(2015,3,16,9,59,0)
-#simbaID=300234060000001;cruiseID='2015N-ICE'; IMBunit='NPOL_01';buoyID='SIMBA_2015a';
+#end = datetime(2015,3,16,0,0,0)
+#simbaID=300234060000001;cruiseID='2015N-ICE'; IMBunit='NPOL_01';buoyID='SIMBA_2015a';buoyID_replacement=buoyID
 #iair = 1; air_snow_no = 29; snow_ice_no = 52; ice_sea_no = 118; franc_bord=53#% epaisseur glacexx; neige xx; franc-bord xx a confirmer (2cm apart)
 #cr4 = 1.6
 #mv=-2.2
@@ -344,7 +342,7 @@ h_sn_air_6h = np.where(h_sn_air_6h==np.nan,0,h_sn_air_6h)
 k_sn = .3
 tgrad = (tc[:,1:] - tc[:,:-1])*50    #K/2cm >> K/m
 #print tgrad
-fc = -k_sn *tgrad
+fc = k_sn *tgrad
 #mask all but snow
 mask = np.ones_like(fc, dtype=bool)
 for i in range(0,fc.shape[0]):
@@ -354,21 +352,23 @@ fc_snow = np.ma.array(fc,mask=mask)
 #ice
 #k_si = 2.03+0.117*S/T
 k_si = 1.9
-fc = -k_si *tgrad
+fc = k_si *tgrad
 #smooth
 for i in range(0,fc.shape[0]):
     fc[i,:] = smooth(fc[i,:],4,window='flat')
 #mask all but ice
 mask = np.ones_like(fc, dtype=bool)
+fco = np.zeros_like(fc[:,0])
 for i in range(0,fc.shape[0]):
     mask[i,int(h_ice_sn_6h[i]):int(h_oc_ice[i])] = False
+    fco[i] = fc[i,int(h_oc_ice[i])-2]  #conductive heat flux 2 sensors above the interface, change sign to match the sign of the latent heat flux (provided by the ocean to melt the ice)
 fc_ice = np.ma.array(fc,mask=mask)
 
 
 #ocean heat fluxes
 #latent heat flux ~ Fl = rho * Li * growth
 rhoi=900        #kg/m3
-li = 334000     #J/kg    (J=kg*m^2/s^2)
+li = .89*333500     #J/kg    (J=kg*m^2/s^2)
 it = (h_oc_ice - sii) *0.02     #ice thickness in m from initial interface (for detecting bottom growth only)
 #print it
 growth = it[:-1] - it[1:]               #ice growth in m/6h
@@ -376,14 +376,24 @@ growth = it[:-1] - it[1:]               #ice growth in m/6h
 growth = growth /(6*60*60)                #ice growth in m/s
 fl = rhoi*li*growth
 fl = smooth(fl,8,window='flat')           #smoothing with 2-day running window
+fco = smooth(fco,8,window='flat')  
+fo = fl+fco[1:]
+
+print fco
+print fl
+print fo
+
 #print fl
 #exit()
 
 
 #plotting############################################################################################3
 fig1 = plt.figure(figsize=(15,11))
-ax = fig1.add_subplot(311)
-#ax.set_title(title,fontsize=20)
+from matplotlib import gridspec
+gs = gridspec.GridSpec(4, 1, height_ratios=[.5,2,2,1])
+ax = fig1.add_subplot(gs[1])
+ax.plot(.02, .91, 'w.', markersize=50, transform=ax.transAxes, markeredgecolor='k', markeredgewidth=1)
+ax.text(.02, .91, 'b', ha='center', va='center', transform=ax.transAxes, fontdict={'color':'k','size':18})
 ax.set_ylabel(r"Distance (m)",size=18)
 #set the limits for the axis
 ax.set_xlim(start,end)
@@ -404,18 +414,20 @@ else:
   a = -30;b=-1
 im = plt.pcolor(x,y,tc.T, cmap=plt.cm.RdYlBu_r, vmin=a, vmax=b)
 #get colorbar off the figure (or x-axis wont be aligned!)
-cbaxes = fig1.add_axes([1.005, 0.73, 0.01, 0.26]) 
+cbaxes = fig1.add_axes([0.905, 0.54, 0.01, 0.245]) 
 cb = plt.colorbar(im, cax = cbaxes)  
 cb.ax.set_ylabel(r'Temperature ($^\circ$C)',size=18)
 
 #plot contours in the ocean
 #mask all but ocean
 mask = np.ones_like(tc, dtype=bool)
+tc_smooth = tc
 for i in range(0,tc.shape[0]):
     mask[i,int(h_oc_ice[i]):] = False
-tc_oc = np.ma.array(tc,mask=mask)
-val = [-1.5]
-plt.contour(x,y,tc_oc.T,val,c='k')
+    tc_smooth[i,:] = smooth(tc[i,:],6,window='flat')    #make contours smoother
+tc_oc = np.ma.array(tc_smooth,mask=mask)
+val = [-1.9,-1.2]
+ax.contour(x,y,tc_oc.T,val,colors='k',linestyles='solid')
 
 #maxice line
 maxice = np.argmax(h_oc_ice)
@@ -424,25 +436,15 @@ meltline[maxice:]=h_oc_ice[maxice]
 meltline = np.ma.array(meltline,mask=meltline==0)
 ax.plot(date_tc,meltline,color='w',linestyle='--',linewidth=3)
 
-#plot ice-ocean interface
+#interfaces
 ax.plot(date_tc,h_oc_ice,'w',linewidth=3)
-
-#plot snow-ice interface
 ax.plot(date_tc,h_ice_sn_6h,'w',linewidth=3)
-
-#plot air-snow interface
 ax.plot(date_tc,h_sn_air_6h,'w',linewidth=3)
 
-#dont plot dates on ax
-ax.tick_params(
-axis='x',          # changes apply to the x-axis
-which='both',      # both major and minor ticks are affected
-bottom='on',      # ticks along the bottom edge are off
-top='on',         # ticks along the top edge are off
-labelbottom='off')
-
 #conductive heat fluxes
-bx = fig1.add_subplot(312, sharex=ax)
+bx = fig1.add_subplot(gs[2])
+bx.plot(.02, .91, 'w.', markersize=50, transform=bx.transAxes, markeredgecolor='k', markeredgewidth=1)
+bx.text(.02, .91, 'c', ha='center', va='center', transform=bx.transAxes, fontdict={'color':'k','size':18})
 bx.set_ylabel(r"Distance (m)",size=18)
 #set the limits for the axis
 bx.set_xlim(start,end)
@@ -455,22 +457,77 @@ plt.yticks(y[0:-cuty][::25], yt)
 plt.pcolor(x,y,fc_snow.T, cmap=plt.cm.RdBu_r, vmin=-30, vmax=30)
 im = plt.pcolor(x,y,fc_ice.T, cmap=plt.cm.RdBu_r, vmin=-30, vmax=30)
 #get colorbar off the figure (or x-axis wont be aligned!)
-cbaxes = fig1.add_axes([1.005, 0.42, 0.01, 0.26]) 
+cbaxes = fig1.add_axes([.905, 0.265, 0.01, 0.245]) 
 cb = plt.colorbar(im, cax = cbaxes)  
 cb.ax.set_ylabel(r'Heat flux ($W/m^2$)',size=18)
 
-#plot ice-ocean interface
+#interfaces
 bx.plot(date_tc,h_oc_ice,'w',linewidth=3)
-
-#plot snow-ice interface
 bx.plot(date_tc,h_ice_sn_6h,'w',linewidth=3)
-
-#plot air-snow interface
 bx.plot(date_tc,h_sn_air_6h,'w',linewidth=3)
-
-#snow-ice formation start
 bx.axvline(snowice,color='.4',linestyle='--',linewidth=4)
 
+#ocean heat flux
+cx = fig1.add_subplot(gs[3])
+cx.plot(.02, .85, 'w.', markersize=50, transform=cx.transAxes, markeredgecolor='k', markeredgewidth=1)
+cx.text(.02, .85, 'd', ha='center', va='center', transform=cx.transAxes, fontdict={'color':'k','size':18})
+cx.set_xlim(start,end)
+cx.set_ylabel(r'Ocean heat flux ($W/m^2$)',size=18)
+cx.plot(date_tc[1:],fo,c='royalblue',linewidth=4)
+#cx.plot(date_tc[1:],fl,c='k',linewidth=4)
+cx.axhline(0,color='.4',linestyle='-',linewidth=1)
+
+#ccx = cx.twinx()
+#ccx.set_ylabel(r'Air temperature ($^\circ$C)',size=18)
+#ccx.plot(date_tc,tc.T[3,:],c='darkred',linewidth=4)
+
+#sea ice drift arrows
+dx = fig1.add_subplot(gs[0])
+dx.plot(.02, .73, 'w.', markersize=50, transform=dx.transAxes, markeredgecolor='k', markeredgewidth=1)
+dx.text(.02, .73, 'a', ha='center', va='center', transform=dx.transAxes, fontdict={'color':'k','size':18})
+
+dx.set_xlim(start,end)
+dx.set_ylim(-1,1)
+dx.tick_params(labelsize=20)
+dx.axis('off')
+
+itv=10
+u = np.asarray(getColumn(path+buoyID_replacement+'_rev.csv', 6),dtype=float)[::itv]
+v = np.asarray(getColumn(path+buoyID_replacement+'_rev.csv', 5),dtype=float)[::itv]
+tmp = getColumn(path+buoyID_replacement+'_rev.csv', 0)
+date_uv = [ datetime.strptime(tmp[x], "%Y-%m-%d %H:%M:%S") for x in range(len(tmp)) ][::itv]
+x_uv = mdates.date2num(date_uv)
+
+#skip last 40 hrs of data - free drift and very high speeds
+qi = dx.quiver(x_uv[:-4],.1, u[:-4], v[:-4], units='width', width=.003, scale=13, color='#3c1053')
+
+ref=.5
+qk = dx.quiverkey(qi, 0.05, 0.1, ref,
+                  "sea ice drift: %s cm/s" % 50,
+                  labelpos='S', coordinates='axes', color='#3c1053',fontproperties={'size': 16})
+
+#highlight storms (all based on Lana's storm table, except the first one which is based on temeprature above -20)
+#MAJOR
+[whole_plot.axvspan(datetime(2015,1,21,15,0), datetime(2015,1,22,15,0), facecolor='#d8bfd8', alpha=0.2, linewidth=0) for whole_plot in [cx,dx]]
+[whole_plot.axvspan(datetime(2015,2,3,11,0), datetime(2015,2,8,21,0), facecolor='#d8bfd8', alpha=0.2, linewidth=0) for whole_plot in [cx,dx]]
+[whole_plot.axvspan(datetime(2015,2,15,12,0), datetime(2015,2,16,17,0), facecolor='#d8bfd8', alpha=0.2, linewidth=0) for whole_plot in [cx,dx]]
+[whole_plot.axvspan(datetime(2015,2,17,16,0), datetime(2015,2,21,4,0), facecolor='#d8bfd8', alpha=0.2, linewidth=0) for whole_plot in [cx,dx]]
+
+[whole_plot.axvspan(datetime(2015,3,2,10,0), datetime(2015,3,4,1,0), facecolor='#d8bfd8', alpha=0.2, linewidth=0) for whole_plot in [cx,dx]]
+[whole_plot.axvspan(datetime(2015,3,7,8,0), datetime(2015,3,8,18,0), facecolor='#d8bfd8', alpha=0.2, linewidth=0) for whole_plot in [cx,dx]]
+[whole_plot.axvspan(datetime(2015,3,14,21,0), datetime(2015,3,16,23,0), facecolor='#d8bfd8', alpha=0.2, linewidth=0) for whole_plot in [cx,dx]]
+
+#minor
+[whole_plot.axvspan(datetime(2015,2,25,6,0), datetime(2015,2,25,20,0), facecolor='cornflowerblue', alpha=0.2, linewidth=0) for whole_plot in [cx,dx]]
+
+#format axis
+#dont plot dates on ax
+ax.tick_params(
+axis='x',          # changes apply to the x-axis
+which='both',      # both major and minor ticks are affected
+bottom='on',      # ticks along the bottom edge are off
+top='on',         # ticks along the top edge are off
+labelbottom='off')
 #dont plot dates on bx
 bx.tick_params(
 axis='x',          # changes apply to the x-axis
@@ -478,22 +535,26 @@ which='both',      # both major and minor ticks are affected
 bottom='on',      # ticks along the bottom edge are off
 top='on',         # ticks along the top edge are off
 labelbottom='off')
+#big labels on cx
+cx.tick_params(
+axis='x',          # changes apply to the x-axis
+which='both',      # both major and minor ticks are affected
+bottom='on',      # ticks along the bottom edge are off
+top='on',         # ticks along the top edge are off
+labelsize=14,
+labelrotation=45)
 
+from matplotlib.dates import MO
+days = mdates.DayLocator()   			# every day
+wks = mdates.WeekdayLocator(byweekday=MO) 	#every monday
 
-#ocean heat flux
-cx = fig1.add_subplot(313,sharex=ax)
-cx.set_xlim(start,end)
-cx.set_ylabel(r'Heat flux ($W/m^2$)',size=18)
-cx.plot(date_tc[1:],fl,c='royalblue',linewidth=3)
-cx.axhline(0,color='.4',linestyle='-',linewidth=1)
+ax.xaxis.set_major_locator(wks)
+ax.xaxis.set_minor_locator(days)
+bx.xaxis.set_major_locator(wks)
+bx.xaxis.set_minor_locator(days)
 
-ccx = cx.twinx()
-ccx.set_ylabel(r'Heat flux ($W/m^2$)',size=18)
-ccx.plot(date_tc[:],fc[:,100],c='darkred',linewidth=3)
-
-cx.axes.get_xaxis().set_ticks([])
-plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=7))
-plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%d-%b'))
-fig1.autofmt_xdate()
-plt.subplots_adjust(top=0.99, right=0.99)
+cx.xaxis.set_major_locator(wks)
+cx.xaxis.set_major_formatter(mdates.DateFormatter('%d-%b'))
+cx.xaxis.set_minor_locator(days)
+    
 fig1.savefig('../plots/simba_storm'+buoyID, bbox_inches='tight')

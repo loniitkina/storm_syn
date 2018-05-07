@@ -162,7 +162,7 @@ m_icecon_a = []
 m_icecon_b = []
 dates = []
 for fn in iclist:
-    break
+    #break
     print fn
     dt = fn.split('_')[-1].split('.')[0]
     date = datetime.strptime(dt, "%Y%m%d%H%M")
@@ -339,22 +339,22 @@ for fn in iclist:
     im = m.pcolormesh(x, y, icecon, cmap=plt.cm.jet)
     m.colorbar()
     
-    ###plot the gates
-    #x, y = m(lons, lats)
-    #im = m.pcolormesh(x, y, gates, cmap=plt.cm.jet)
-    lonbox = [c1lon,c2lon,c3lon,c4lon]
-    latbox = [c1lat,c2lat,c3lat,c4lat]
-    xbox,ybox = m(lonbox,latbox)
-    xybox = zip(xbox,ybox)
-    poly = Polygon(xybox, edgecolor='w', alpha=1, fill=False, linewidth=3)
-    plt.gca().add_patch(poly)
+    ####plot the gates
+    ##x, y = m(lons, lats)
+    ##im = m.pcolormesh(x, y, gates, cmap=plt.cm.jet)
+    #lonbox = [c1lon,c2lon,c3lon,c4lon]
+    #latbox = [c1lat,c2lat,c3lat,c4lat]
+    #xbox,ybox = m(lonbox,latbox)
+    #xybox = zip(xbox,ybox)
+    #poly = Polygon(xybox, edgecolor='w', alpha=1, fill=False, linewidth=3)
+    #plt.gca().add_patch(poly)
     
     #A
     lonbox = [c1lon,c2lon,c3lon_a,c4lon_a]
     latbox = [c1lat,c2lat,c3lat_a,c4lat_a]
     xbox,ybox = m(lonbox,latbox)
     xybox = zip(xbox,ybox)
-    poly = Polygon(xybox, edgecolor='w', alpha=1, fill=False, linewidth=3, linestyle='--')
+    poly = Polygon(xybox, edgecolor='w', alpha=1, fill=False, linewidth=3, linestyle='-')
     plt.gca().add_patch(poly)
     
 
@@ -377,7 +377,7 @@ for fn in iclist:
     outname = 'icecon'+dt
     fig.savefig(outpath+outname,bbox_inches='tight')
 
-    #exit()
+    exit()
   
 ##save lists 
 #np.save(inpath+'advection',advection)
@@ -425,7 +425,7 @@ aax.set_ylabel(r'Distributed heat flux $(W/m^2)$', fontsize=12)
 #aax.plot(dates,advection*.0015, label='OSI-SAF')
 #latent heat flux ~ as if the ice was melting/growing
 rhoi=900        #kg/m3
-li = 334000     #J/kg    (J=kg*m^2/s^2)
+li = 333500*.89     #J/kg    (J=kg*m^2/s^2)
 export = advection_a *1e6                    #in m^2/s
 area = (xmc1-xmc2)*(ymc1-yms)                    #in m^2
 a_fl_max = rhoi*li*export/area*1.5
