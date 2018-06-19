@@ -16,15 +16,15 @@ fname = 'tsx20150128'
 leadval = [9,9,9,9,12]
 polyid = 1
 
-matfile = 'Segmented_image_20150207.mat'
-fname = 'tsx20150207'
-leadval = [6,6,7,8,15]
-polyid = 2
+#matfile = 'Segmented_image_20150207.mat'
+#fname = 'tsx20150207'
+#leadval = [6,6,7,8,15]
+#polyid = 2
 
-#matfile = 'Segmented_image_20150212.mat'
-#fname = 'tsx20150212'
-#leadval = [5,8,12,13,14]
-#polyid = 0
+matfile = 'Segmented_image_20150212.mat'
+fname = 'tsx20150212'
+leadval = [5,8,12,13,14]
+polyid = 0
 
 
 path = '../data/'
@@ -107,7 +107,7 @@ area = PolyArea(px,py)
 
 old_ice_vol_max = area*(1-lead_fraction)*1.5
 old_ice_vol_min = area*(1-lead_fraction)*1
-new_ice_vol = area*lead_fraction*.22
+new_ice_vol = area*lead_fraction*.28                            #estimated from lead observations 5 days after the storm (average of level ice, rafted ice excluded)
 
 new_ice_fraction_max = new_ice_vol/(old_ice_vol_max+new_ice_vol)
 new_ice_fraction_min = new_ice_vol/(old_ice_vol_min+new_ice_vol)

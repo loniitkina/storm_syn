@@ -532,7 +532,7 @@ h_sn_air_6h = ts_sn_6h.values
 #fancy plots
 fig1 = plt.figure(figsize=(15,11))
 ax = fig1.add_subplot(211)
-#ax.set_title(title,fontsize=20)
+#ax.set_title('b',fontsize=20)
 ax.set_ylabel(r"Distance (m)",size=18)
 #set the limits for the axis
 ax.set_xlim(start,end)

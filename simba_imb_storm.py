@@ -45,7 +45,7 @@ cr4= 1.5
 jump = 20
 mv=-0.1875
 skip=2
-snowice = datetime(2015,2,17,23,0,0)
+snowice = datetime(2015,2,15,16,0,0)
 
 ##NPOL01
 #start = datetime(2015,1,20,6,0,0)
@@ -395,6 +395,8 @@ ax = fig1.add_subplot(gs[1])
 ax.plot(.02, .91, 'w.', markersize=50, transform=ax.transAxes, markeredgecolor='k', markeredgewidth=1)
 ax.text(.02, .91, 'b', ha='center', va='center', transform=ax.transAxes, fontdict={'color':'k','size':18})
 ax.set_ylabel(r"Distance (m)",size=18)
+ax.get_yaxis().set_label_coords(-0.04,0.5)
+
 #set the limits for the axis
 ax.set_xlim(start,end)
 ax.grid('on')
@@ -446,6 +448,7 @@ bx = fig1.add_subplot(gs[2])
 bx.plot(.02, .91, 'w.', markersize=50, transform=bx.transAxes, markeredgecolor='k', markeredgewidth=1)
 bx.text(.02, .91, 'c', ha='center', va='center', transform=bx.transAxes, fontdict={'color':'k','size':18})
 bx.set_ylabel(r"Distance (m)",size=18)
+bx.get_yaxis().set_label_coords(-0.04,0.5)
 #set the limits for the axis
 bx.set_xlim(start,end)
 bx.grid('on')
@@ -472,7 +475,8 @@ cx = fig1.add_subplot(gs[3])
 cx.plot(.02, .85, 'w.', markersize=50, transform=cx.transAxes, markeredgecolor='k', markeredgewidth=1)
 cx.text(.02, .85, 'd', ha='center', va='center', transform=cx.transAxes, fontdict={'color':'k','size':18})
 cx.set_xlim(start,end)
-cx.set_ylabel(r'Ocean heat flux ($W/m^2$)',size=18)
+cx.set_ylabel(r'Heat flux ($W/m^2$)',size=18)
+cx.get_yaxis().set_label_coords(-0.04,0.5)
 cx.plot(date_tc[1:],fo,c='royalblue',linewidth=4)
 #cx.plot(date_tc[1:],fl,c='k',linewidth=4)
 cx.axhline(0,color='.4',linestyle='-',linewidth=1)
@@ -508,17 +512,16 @@ qk = dx.quiverkey(qi, 0.05, 0.1, ref,
 
 #highlight storms (all based on Lana's storm table, except the first one which is based on temeprature above -20)
 #MAJOR
-[whole_plot.axvspan(datetime(2015,1,21,15,0), datetime(2015,1,22,15,0), facecolor='#d8bfd8', alpha=0.2, linewidth=0) for whole_plot in [cx,dx]]
-[whole_plot.axvspan(datetime(2015,2,3,11,0), datetime(2015,2,8,21,0), facecolor='#d8bfd8', alpha=0.2, linewidth=0) for whole_plot in [cx,dx]]
-[whole_plot.axvspan(datetime(2015,2,15,12,0), datetime(2015,2,16,17,0), facecolor='#d8bfd8', alpha=0.2, linewidth=0) for whole_plot in [cx,dx]]
-[whole_plot.axvspan(datetime(2015,2,17,16,0), datetime(2015,2,21,4,0), facecolor='#d8bfd8', alpha=0.2, linewidth=0) for whole_plot in [cx,dx]]
+[whole_plot.axvspan(datetime(2015,1,21,15,0), datetime(2015,1,22,15,0), facecolor='#d8bfd8', alpha=0.4, linewidth=0) for whole_plot in [cx,dx]]
+[whole_plot.axvspan(datetime(2015,2,3,11,0), datetime(2015,2,8,21,0), facecolor='#d8bfd8', alpha=0.4, linewidth=0) for whole_plot in [cx,dx]]
+[whole_plot.axvspan(datetime(2015,2,15,12,0), datetime(2015,2,21,4,0), facecolor='#d8bfd8', alpha=0.4, linewidth=0) for whole_plot in [cx,dx]]
 
-[whole_plot.axvspan(datetime(2015,3,2,10,0), datetime(2015,3,4,1,0), facecolor='#d8bfd8', alpha=0.2, linewidth=0) for whole_plot in [cx,dx]]
-[whole_plot.axvspan(datetime(2015,3,7,8,0), datetime(2015,3,8,18,0), facecolor='#d8bfd8', alpha=0.2, linewidth=0) for whole_plot in [cx,dx]]
-[whole_plot.axvspan(datetime(2015,3,14,21,0), datetime(2015,3,16,23,0), facecolor='#d8bfd8', alpha=0.2, linewidth=0) for whole_plot in [cx,dx]]
+[whole_plot.axvspan(datetime(2015,3,2,10,0), datetime(2015,3,4,1,0), facecolor='#d8bfd8', alpha=0.4, linewidth=0) for whole_plot in [cx,dx]]
+[whole_plot.axvspan(datetime(2015,3,7,8,0), datetime(2015,3,8,18,0), facecolor='#d8bfd8', alpha=0.4, linewidth=0) for whole_plot in [cx,dx]]
+[whole_plot.axvspan(datetime(2015,3,14,21,0), datetime(2015,3,16,23,0), facecolor='#d8bfd8', alpha=0.4, linewidth=0) for whole_plot in [cx,dx]]
 
-#minor
-[whole_plot.axvspan(datetime(2015,2,25,6,0), datetime(2015,2,25,20,0), facecolor='cornflowerblue', alpha=0.2, linewidth=0) for whole_plot in [cx,dx]]
+##minor
+#[whole_plot.axvspan(datetime(2015,2,25,6,0), datetime(2015,2,25,20,0), facecolor='cornflowerblue', alpha=0.2, linewidth=0) for whole_plot in [cx,dx]]
 
 #format axis
 #dont plot dates on ax
