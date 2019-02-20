@@ -34,12 +34,22 @@ melt = datetime(2015,5,26,0,0,0)
 skip=0      #how many thermisters to skip in the start (permanent failure)
 mv=0
 ################################################PICK A BUOY
+##Initial conditions
+#start = deployment date
+#end = end of useful data
+
+#iair = first sensor in air
+#air_snow_no = first sensor in snow
+#snow_ice_no = first sensor in ice
+#ice_sea_no = first sensor in water
+#fb = sensor number at freeboard
+
 ##FMI14
 #start = datetime(2015,1,25,18,0,0)
 #end = datetime(2015,2,26,12,0,0)
 #melt = datetime(2015,2,20,0,0,0)
 #simbaID=300234060695050;cruiseID='N-ICE'; IMBunit='FMI_14';buoyID='SIMBA_2015e';
-#iair = 1; air_snow_no = 45; snow_ice_no = 45; ice_sea_no = 120; franc_bord=46 # normal chain (2cm apart)
+#iair = 1; air_snow_no = 45; snow_ice_no = 45; ice_sea_no = 120; fb=46
 #cr4 = 1.6
 #octmplim = -10
 
@@ -47,7 +57,7 @@ mv=0
 #start = datetime(2015,1,28,0,0,0)
 #end = datetime(2015,2,19,17,0,0)
 #simbaID=300234060669770;cruiseID='N-ICE'; IMBunit='FMI_19';buoyID='SIMBA_2015f';
-#iair = 1; air_snow_no = 34; snow_ice_no = 55; ice_sea_no = 100; franc_bord=54
+#iair = 1; air_snow_no = 34; snow_ice_no = 55; ice_sea_no = 100; fb=54
 #cr4= 1.5
 #jump = 20
 #mv=-0.1875
@@ -57,14 +67,14 @@ mv=0
 #start = datetime(2015,1,29,17,0,0)
 #end = datetime(2015,3,4,0,0,0)
 #simbaID=300234060666760;cruiseID='N-ICE'; IMBunit='FMI_20';buoyID='SIMBA_2015g';
-#iair = 1; air_snow_no = 33; snow_ice_no = 44; ice_sea_no = 109; franc_bord=56
+#iair = 1; air_snow_no = 33; snow_ice_no = 44; ice_sea_no = 109; fb=56
 #cr4 = 1.7
 
 ##NPOL01
 #start = datetime(2015,1,20,6,0,0)
 #end = datetime(2015,3,16,9,59,0)
 #simbaID=300234060000001;cruiseID='2015N-ICE'; IMBunit='NPOL_01';buoyID='SIMBA_2015a';
-#iair = 1; air_snow_no = 29; snow_ice_no = 52; ice_sea_no = 118; franc_bord=53
+#iair = 1; air_snow_no = 29; snow_ice_no = 52; ice_sea_no = 118; fb=53
 #cr4 = 1.6
 #mv=-2.2
 
@@ -72,53 +82,35 @@ mv=0
 #start = datetime(2015,1,15,23,0,0)
 #end = datetime(2015,2,16,8,59,0)
 #simbaID=300234060000002;cruiseID='2015N-ICE'; IMBunit='NPOL_03';buoyID='SIMBA_2015b';
-#iair = 1; air_snow_no = 37; snow_ice_no = 52; ice_sea_no = 119; franc_bord=54
+#iair = 1; air_snow_no = 37; snow_ice_no = 52; ice_sea_no = 119; fb=54
 #cr4 = 1.9
 
 ##NPOL05
 #start = datetime(2015,3,7,16,0,0)
 #end = datetime(2015,4,25,23,59,0)
 #simbaID=300234061762880;cruiseID='2015N-ICE'; IMBunit='NPOL_05';buoyID='SIMBA_2015d';
-#iair = 1; air_snow_no = 52; snow_ice_no = 64; ice_sea_no = 129; franc_bord=68
+#iair = 1; air_snow_no = 52; snow_ice_no = 64; ice_sea_no = 129; fb=68
 ##it seems like all the initial interfaces have an offset of at least 4 thermistors (bad readings or bad conversion???)
-#iair = 1; air_snow_no = 40; snow_ice_no = 58; ice_sea_no = 119; franc_bord=68
+#iair = 1; air_snow_no = 40; snow_ice_no = 58; ice_sea_no = 119; fb=68
 #cr4 = 1.5
 
 #NPOL04
 start = datetime(2015,4,24,0,0,0)
 end = datetime(2015,6,8,0,0,0)
 simbaID=300234061762880;cruiseID='2015N-ICE'; IMBunit='NPOL_04';buoyID='SIMBA_2015c';
-iair = 1; air_snow_no = 16; snow_ice_no = 47; ice_sea_no = 138; franc_bord=48
+iair = 1; air_snow_no = 16; snow_ice_no = 47; ice_sea_no = 138; fb=48
 cr4 = 1.9
 nta=1
 swin=6
 cr1 = -1.8750
 jump_air = 5
 
-##IAOOS4
-#start = datetime(2015,1,23,14,45,0)
-#end = datetime(2015,3,16,23,50,0)
-#simbaID=300234061260820;cruiseID='2015N-ICE'; IMBunit='Locean_09';buoyID='SIMBA_2015h';
-#iair = 1; air_snow_no = 26; snow_ice_no = 53; ice_sea_no = 130; franc_bord=54#% epaisseur glace 155; neige 55; franc-bord 2
-#ssfn = path+'hot_wires/'+'snowstake_floe1_3.txt'
-#hwfn = path+'hot_wires/'+'hw_floe1_4.txt'
-#cr4 = 1.42
-#nta=7
-
-##IAOOS6
-#start = datetime(2015,2,1,17,0,0)
-#end = datetime(2015,2,21,22,0,0)
-#simbaID=300234061267810;cruiseID='2015N-ICE'; IMBunit='Locean_04';buoyID='SIMBA_2015i';
-#iair = 1; air_snow_no = 9; snow_ice_no = 43; ice_sea_no = 102; franc_bord=41#% pas de mesure car simple echange de valise avec la LOCEAN06!
-#cr4 = 1.45
-#jump = 13
-
 ##NPOL041
 #start = datetime(2015,9,15,13,0,0)
 #end = datetime(2015,12,30,0,0,0)
 ##melt = datetime(2015,5,26,0,0,0)
 #simbaID=300234061762880;cruiseID='FS-2015'; IMBunit='NPOL_41';buoyID='SIMBA_2015j';
-#iair = 1; air_snow_no = 16; snow_ice_no = 47; ice_sea_no = 138; franc_bord=48
+#iair = 1; air_snow_no = 16; snow_ice_no = 47; ice_sea_no = 138; fb=48
 
 #read the data###############################################################################################3
 

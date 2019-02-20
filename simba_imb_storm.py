@@ -36,11 +36,21 @@ skip=0      #how many thermisters to skip in the start (permanent failure)
 
 cuty=100    #how many termisters in the ocean can be cut off the plot
 #pick a buoy###############################################################################################3
+##Initial conditions
+#start = deployment date
+#end = end of useful data
+
+#iair = first sensor in air
+#air_snow_no = first sensor in snow
+#snow_ice_no = first sensor in ice
+#ice_sea_no = first sensor in water
+#fb = sensor number at freeboard
+
 #FMI19
 start = datetime(2015,1,28,0,0,0)
 end = datetime(2015,2,19,17,0,0)
 simbaID=300234060669770;cruiseID='N-ICE'; IMBunit='FMI_19';buoyID='SIMBA_2015f'; buoyID_replacement='SNOW_2015a'
-iair = 1; air_snow_no = 34; snow_ice_no = 55; ice_sea_no = 100; franc_bord=54# epaisseur glace90; neige 43; franc-bord -1 a confirmer (2cm apart)
+iair = 1; air_snow_no = 34; snow_ice_no = 55; ice_sea_no = 100; fb=54
 cr4= 1.5
 jump = 20
 mv=-0.1875
@@ -51,7 +61,7 @@ snowice = datetime(2015,2,15,16,0,0)
 #start = datetime(2015,1,20,6,0,0)
 #end = datetime(2015,3,16,0,0,0)
 #simbaID=300234060000001;cruiseID='2015N-ICE'; IMBunit='NPOL_01';buoyID='SIMBA_2015a';buoyID_replacement=buoyID
-#iair = 1; air_snow_no = 29; snow_ice_no = 52; ice_sea_no = 118; franc_bord=53#% epaisseur glacexx; neige xx; franc-bord xx a confirmer (2cm apart)
+#iair = 1; air_snow_no = 29; snow_ice_no = 52; ice_sea_no = 118; fb=53
 #cr4 = 1.6
 #mv=-2.2
 #jump_air = 5
